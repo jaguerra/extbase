@@ -806,6 +806,7 @@ class Tx_Extbase_Persistence_Storage_Typo3DbBackend implements Tx_Extbase_Persis
 			}
 			if(!empty($statement)) {
 				$statement = substr($statement, 5);
+                $statement = ' ('.$tableName.'.uid IS NULL OR ('.$statement.')) ';
 				$sql['additionalWhereClause'][] = $statement;
 			}
 		}
@@ -821,7 +822,9 @@ class Tx_Extbase_Persistence_Storage_Typo3DbBackend implements Tx_Extbase_Persis
 	protected function addSysLanguageStatement($tableName, array &$sql) {
 		if (is_array($GLOBALS['TCA'][$tableName]['ctrl'])) {
 			if(isset($GLOBALS['TCA'][$tableName]['ctrl']['languageField']) && $GLOBALS['TCA'][$tableName]['ctrl']['languageField'] !== NULL) {
-				$sql['additionalWhereClause'][] = $tableName . '.' . $GLOBALS['TCA'][$tableName]['ctrl']['languageField'] . ' IN (0,-1)';
+				$statement = $tableName . '.' . $GLOBALS['TCA'][$tableName]['ctrl']['languageField'] . ' IN (0,-1)';
+                $statement = ' ('.$tableName.'.uid IS NULL OR ('.$statement.')) ';
+                $sql['additionalWhereClause'][] = $statement;
 			}
 		}
 	}
@@ -839,7 +842,9 @@ class Tx_Extbase_Persistence_Storage_Typo3DbBackend implements Tx_Extbase_Persis
 			$this->tableInformationCache[$tableName]['columnNames'] = $this->databaseHandle->admin_get_fields($tableName);
 		}
 		if (is_array($GLOBALS['TCA'][$tableName]['ctrl']) && array_key_exists('pid', $this->tableInformationCache[$tableName]['columnNames'])) {
-			$sql['additionalWhereClause'][] = $tableName . '.pid IN (' . implode(', ', $storagePageIds) . ')';
+			$statement = $tableName . '.pid IN (' . implode(', ', $storagePageIds) . ')';
+            $statement = ' ('.$tableName.'.uid IS NULL OR ('.$statement.')) ';
+            $sql['additionalWhereClause'][] = $statement;
 		}
 	}
 
